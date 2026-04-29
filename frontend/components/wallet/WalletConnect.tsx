@@ -21,6 +21,9 @@ export function WalletConnect() {
         </StatusPill>
       </div>
       <p className="text-sm text-slate-300">Address: {shortAddress(address)}</p>
+      <p className="text-xs text-slate-400">
+        Connect any supported wallet to initialize Base-secured agent session context.
+      </p>
       <div className="flex items-center gap-3">
         <ConnectButton.Custom>
           {({ account, chain, openConnectModal, mounted }) => {
