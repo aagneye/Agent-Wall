@@ -35,8 +35,8 @@ class PlannerAction(BaseModel):
 
 class PlannerResponse(BaseModel):
     prompt: str
-    intent: str
-    safety_note: str
+    intent: Literal["safe_capital_optimization", "unsafe_prompt_detected"]
+    safety_note: str = Field(min_length=20, max_length=220)
     deterministic: bool = True
     actions: list[PlannerAction] = Field(min_length=1, max_length=5)
 
