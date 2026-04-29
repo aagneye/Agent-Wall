@@ -5,11 +5,13 @@ import { StatusPill } from "@/components/ui/status-pill";
 import { ENFORCED_CHAIN_NAME } from "@/lib/wallet/chains";
 import { shortAddress } from "@/lib/wallet/format";
 import { useBaseEnforcement } from "@/hooks/use-base-enforcement";
+import { useTransactionStatusPrep } from "@/hooks/use-transaction-status-prep";
 import { useWalletStatus } from "@/hooks/use-wallet-status";
 
 export function WalletStatus() {
   const { address, chainId, isConnected, isOnEnforcedChain } = useWalletStatus();
   const { isSwitchingChain } = useBaseEnforcement();
+  const { state } = useTransactionStatusPrep();
 
   return (
     <GlassPanel className="flex flex-col gap-4">
@@ -32,6 +34,10 @@ export function WalletStatus() {
         {isSwitchingChain ? (
           <p className="text-xs text-amber-300">Switching network to Base...</p>
         ) : null}
+        <div className="flex items-center gap-2">
+          <span>Transaction State:</span>
+          <StatusPill tone={state.status === "failed" ? "danger" : "neutral"}>{state.status}</StatusPill>
+        </div>
       </div>
     </GlassPanel>
   );
