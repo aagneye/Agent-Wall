@@ -20,6 +20,13 @@ DEFAULT_ACTION_ORDER = [
 
 
 class PlannerAgent:
+    def _is_unsafe_prompt(self, prompt: str) -> bool:
+        lowered = prompt.lower()
+        return any(pattern in lowered for pattern in UNSAFE_PROMPT_PATTERNS)
+
+    def _safe_fallback_actions(self) -> list[str]:
+        return ["check_protocol_options"]
+
     def _build_action(self, action_type: str, index: int) -> PlannerAction:
         descriptions = {
             "check_protocol_options": "Compare vetted protocol options for safety, liquidity, and reliability.",
@@ -58,10 +65,18 @@ class PlannerAgent:
         return requested
 
     def plan(self, payload: PlannerRequest) -> PlannerResponse:
-        actions = self._extract_requested_actions(payload.prompt)
+        if self._is_unsafe_prompt(payload.prompt):
+            actions = self._safe_fallback_actions()
+            safety_note = (
+                "Prompt contained unsafe language. Planner returned a minimal analysis-only safe plan."
+            )
+        else:
+            actions = self._extract_requested_actions(payload.prompt)
+            safety_note = "Plan-only mode. No transactions are executed."
+
         return PlannerResponse(
             prompt=payload.prompt,
             intent=DEFAULT_INTENT,
-            safety_note="Plan-only mode. No transactions are executed.",
+            safety_note=safety_note,
             actions=[self._build_action(action_type, idx + 1) for idx, action_type in enumerate(actions)],
         )
