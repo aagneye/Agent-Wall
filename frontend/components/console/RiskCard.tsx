@@ -15,6 +15,7 @@ export function RiskCard({ context }: RiskCardProps) {
   }
 
   const risky = context.riskLevel === "risky";
+  const barWidth = risky ? "78%" : "22%";
 
   return (
     <section className="rounded-xl border border-slate-200/10 bg-slate-950/60 p-4">
@@ -23,6 +24,15 @@ export function RiskCard({ context }: RiskCardProps) {
         {risky ? "Risky Action" : "Safe Action"}
       </p>
       <p className="mt-2 text-xs text-slate-300">{context.explanation}</p>
+      <div className="mt-3">
+        <div className="mb-1 flex items-center justify-between text-[11px]">
+          <span className="text-slate-400">Risk Intensity</span>
+          <span className={risky ? "text-rose-300" : "text-emerald-300"}>{barWidth}</span>
+        </div>
+        <div className="h-1.5 rounded bg-slate-800">
+          <div className={`h-full rounded ${risky ? "bg-rose-400" : "bg-emerald-400"}`} style={{ width: barWidth }} />
+        </div>
+      </div>
     </section>
   );
 }
