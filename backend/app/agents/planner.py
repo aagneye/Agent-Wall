@@ -1,4 +1,4 @@
-from app.schemas.planner import PlannerRequest, PlannerResponse
+from app.schemas.planner import PlannerAction, PlannerRequest, PlannerResponse
 
 UNSAFE_PROMPT_PATTERNS = {
     "leverage",
@@ -20,6 +20,30 @@ DEFAULT_ACTION_ORDER = [
 
 
 class PlannerAgent:
+    def _build_action(self, action_type: str, index: int) -> PlannerAction:
+        descriptions = {
+            "check_protocol_options": "Compare vetted protocol options for safety, liquidity, and reliability.",
+            "swap_assets": "Swap into required asset allocation using conservative slippage assumptions.",
+            "deposit_funds": "Deposit assets into selected venue with exposure limits enabled.",
+            "stake_tokens": "Stake eligible tokens only if rewards and lockup risks are acceptable.",
+            "bridge_assets": "Bridge assets only through approved routes with confirmation checks.",
+        }
+        reasons = {
+            "check_protocol_options": "Prevents blind allocation and prioritizes known, lower-risk venues.",
+            "swap_assets": "Aligns holdings with target allocation before deploying capital.",
+            "deposit_funds": "Moves idle capital into yield strategy after validation steps.",
+            "stake_tokens": "Enables additional yield when lockup and smart contract risk remain bounded.",
+            "bridge_assets": "Ensures cross-chain movement is intentional and constrained.",
+        }
+
+        return PlannerAction(
+            id=f"ACT-{index:02d}",
+            type=action_type,  # type: ignore[arg-type]
+            description=descriptions[action_type],
+            reason=reasons[action_type],
+            risk_level="low",
+        )
+
     def _extract_requested_actions(self, prompt: str) -> list[str]:
         lowered = prompt.lower()
         requested: list[str] = []
@@ -34,9 +58,10 @@ class PlannerAgent:
         return requested
 
     def plan(self, payload: PlannerRequest) -> PlannerResponse:
+        actions = self._extract_requested_actions(payload.prompt)
         return PlannerResponse(
             prompt=payload.prompt,
             intent=DEFAULT_INTENT,
             safety_note="Plan-only mode. No transactions are executed.",
-            actions=[],
+            actions=[self._build_action(action_type, idx + 1) for idx, action_type in enumerate(actions)],
         )
