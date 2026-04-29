@@ -18,6 +18,7 @@ export function useAgentConsole() {
     const validationError = validatePromptInput(prompt);
     if (validationError) {
       setError(validationError);
+      setStatus("error");
       return;
     }
 
