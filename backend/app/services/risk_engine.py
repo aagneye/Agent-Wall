@@ -26,6 +26,16 @@ KNOWN_TARGET_ADDRESSES = {
 
 
 class RiskEngine:
+    def _summarize(self, findings: list[RiskFinding], risk_score: int) -> str:
+        if not findings:
+            return "Low risk: no suspicious approvals, drain patterns, or unknown critical interactions detected."
+
+        top_rules = ", ".join(item.rule_id for item in findings[:3])
+        return (
+            f"Risk score {risk_score}/100. Key drivers: {top_rules}. "
+            "Review approvals, address trust, and transaction sizing before execution."
+        )
+
     def _check_approval_scope_risk(self, actions: list[ProposedAction]) -> list[RiskFinding]:
         findings: list[RiskFinding] = []
         for action in actions:
@@ -164,5 +174,5 @@ class RiskEngine:
         findings.extend(self._check_approval_scope_risk(actions))
         total_score = sum(item.score_impact for item in findings)
         risk_score = min(100, total_score)
-        explanation = "Risk engine found no high-risk patterns in the proposed actions."
+        explanation = self._summarize(findings, risk_score)
         return risk_score, findings, explanation
