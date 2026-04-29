@@ -20,7 +20,12 @@ export function AgentConsole() {
         <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
           <ConsoleShell>
             <div className="space-y-4">
-              <PromptInput value={prompt} disabled={status === "loading"} onChange={setPrompt} />
+              <PromptInput
+                value={prompt}
+                disabled={status === "loading"}
+                onChange={setPrompt}
+                onSubmitShortcut={submitPrompt}
+              />
               <SubmitBar
                 isLoading={status === "loading"}
                 status={status}
