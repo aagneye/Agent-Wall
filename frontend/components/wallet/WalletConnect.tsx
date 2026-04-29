@@ -22,7 +22,26 @@ export function WalletConnect() {
       </div>
       <p className="text-sm text-slate-300">Address: {shortAddress(address)}</p>
       <div className="flex items-center gap-3">
-        <ConnectButton />
+        <ConnectButton.Custom>
+          {({ account, chain, openConnectModal, mounted }) => {
+            const ready = mounted;
+            const connected = ready && account && chain;
+
+            if (!connected) {
+              return (
+                <Button onClick={openConnectModal} disabled={!ready}>
+                  Connect Wallet
+                </Button>
+              );
+            }
+
+            return (
+              <StatusPill tone="success">
+                {account.displayName} on {chain.name}
+              </StatusPill>
+            );
+          }}
+        </ConnectButton.Custom>
         {isConnected ? (
           <Button variant="secondary" onClick={() => disconnect()}>
             Disconnect
