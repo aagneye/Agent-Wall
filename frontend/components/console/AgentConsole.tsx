@@ -7,11 +7,22 @@ import { PromptHistory } from "@/components/console/PromptHistory";
 import { PromptInput } from "@/components/console/PromptInput";
 import { RecentActions } from "@/components/console/RecentActions";
 import { SubmitBar } from "@/components/console/SubmitBar";
+import { TransactionPreview } from "@/components/console/TransactionPreview";
 import { useAgentConsole } from "@/components/console/use-agent-console";
 
 export function AgentConsole() {
-  const { prompt, setPrompt, status, error, submitPrompt, actions, activityLog, promptHistory } =
-    useAgentConsole();
+  const {
+    prompt,
+    setPrompt,
+    status,
+    error,
+    submitPrompt,
+    actions,
+    activityLog,
+    promptHistory,
+    preview,
+    isSimulationLoading
+  } = useAgentConsole();
 
   return (
     <main className="min-h-screen px-6 py-14 text-slate-100">
@@ -37,6 +48,7 @@ export function AgentConsole() {
           <div className="space-y-4">
             <RecentActions items={actions} />
             <PromptHistory items={promptHistory} />
+            <TransactionPreview preview={preview} isLoading={isSimulationLoading} />
           </div>
         </div>
         <div className="grid gap-4">
