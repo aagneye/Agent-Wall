@@ -2,9 +2,16 @@
 
 import { useState } from "react";
 import { initialActivityLog, initialRecentActions } from "@/components/console/seed-data";
-import type { ActivityLogItem, AgentActionItem, AgentRunStatus } from "@/components/console/types";
+import type {
+  ActivityLogItem,
+  AgentActionItem,
+  AgentRunStatus,
+  TransactionPreviewData
+} from "@/components/console/types";
 import { validatePromptInput } from "@/components/console/validation";
+import { toTransactionPreviewData } from "@/components/console/preview-format";
 import { submitAgentPrompt } from "@/lib/api/agent-console";
+import { simulateTransaction } from "@/lib/api/tenderly";
 
 export function useAgentConsole() {
   const [prompt, setPrompt] = useState("");
@@ -13,6 +20,8 @@ export function useAgentConsole() {
   const [promptHistory, setPromptHistory] = useState<string[]>([]);
   const [actions, setActions] = useState<AgentActionItem[]>(initialRecentActions);
   const [activityLog, setActivityLog] = useState<ActivityLogItem[]>(initialActivityLog);
+  const [preview, setPreview] = useState<TransactionPreviewData | null>(null);
+  const [isSimulationLoading, setIsSimulationLoading] = useState(false);
 
   async function submitPrompt(): Promise<void> {
     const validationError = validatePromptInput(prompt);
@@ -76,6 +85,10 @@ export function useAgentConsole() {
     setActions,
     activityLog,
     setActivityLog,
+    preview,
+    setPreview,
+    isSimulationLoading,
+    setIsSimulationLoading,
     submitPrompt
   };
 }
