@@ -18,8 +18,28 @@ PROTOCOL_TRUST_SCORES = {
     "unknown": 35,
 }
 
+KNOWN_TARGET_ADDRESSES = {
+    "0xaavev3pool",
+    "0xcompoundc3pool",
+    "0xbasebridge",
+}
+
 
 class RiskEngine:
+    def _check_unknown_address_interactions(self, actions: list[ProposedAction]) -> list[RiskFinding]:
+        findings: list[RiskFinding] = []
+        for action in actions:
+            if action.target_address.lower() not in KNOWN_TARGET_ADDRESSES:
+                findings.append(
+                    self._finding(
+                        "unknown_address_interactions",
+                        "medium",
+                        RISK_WEIGHTS["unknown_address_interactions"],
+                        f"Action {action.id} interacts with an unknown target address.",
+                    )
+                )
+        return findings
+
     def _check_unusual_transaction_size(self, actions: list[ProposedAction]) -> list[RiskFinding]:
         findings: list[RiskFinding] = []
         for action in actions:
@@ -126,6 +146,7 @@ class RiskEngine:
         findings.extend(self._check_protocol_trust_score(actions))
         findings.extend(self._check_wallet_drain_patterns(actions))
         findings.extend(self._check_unusual_transaction_size(actions))
+        findings.extend(self._check_unknown_address_interactions(actions))
         total_score = sum(item.score_impact for item in findings)
         risk_score = min(100, total_score)
         explanation = "Risk engine found no high-risk patterns in the proposed actions."
