@@ -31,3 +31,18 @@ export type TransactionPreviewData = {
   suspiciousBehaviorDetected: boolean;
   humanExplanation: string;
 };
+
+export type ApprovalDecision = "approved" | "rejected" | "pending";
+
+export type PolicyDetail = {
+  label: string;
+  value: string;
+  pass: boolean;
+};
+
+export type ApprovalContext = {
+  title: string;
+  explanation: string;
+  riskLevel: "safe" | "risky";
+  policyDetails: PolicyDetail[];
+};
