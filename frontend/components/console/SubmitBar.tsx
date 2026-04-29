@@ -8,10 +8,17 @@ type SubmitBarProps = {
 };
 
 export function SubmitBar({ isLoading, status, error, onSubmit }: SubmitBarProps) {
+  const statusText =
+    isLoading
+      ? "Running secure analysis..."
+      : status === "success"
+        ? "Ready for approval review."
+        : "Submit prompt to backend orchestrator";
+
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <p className="text-xs text-slate-400">{isLoading ? "Running secure analysis..." : "Submit prompt to backend orchestrator"}</p>
+        <p className={`text-xs text-slate-400 ${isLoading ? "loading-pulse" : ""}`}>{statusText}</p>
         <Button onClick={onSubmit} disabled={isLoading}>
           {isLoading ? "Submitting..." : "Run Prompt"}
         </Button>

@@ -18,7 +18,13 @@ export function TransactionPreview({ preview, isLoading = false }: TransactionPr
   return (
     <section className="rounded-xl border border-cyan-300/20 bg-gradient-to-br from-slate-950/90 to-slate-900/70 p-4 shadow-lg shadow-cyan-500/10">
       <h2 className="mb-3 text-sm font-semibold text-slate-100">Transaction Preview</h2>
-      {isLoading ? <p className="text-xs text-cyan-300">Running deterministic Tenderly simulation...</p> : null}
+      {isLoading ? (
+        <div className="space-y-2">
+          <p className="loading-pulse text-xs text-cyan-300">Running deterministic Tenderly simulation...</p>
+          <div className="loading-pulse h-2 rounded bg-slate-800/80" />
+          <div className="loading-pulse h-2 w-3/4 rounded bg-slate-800/80" />
+        </div>
+      ) : null}
       {!isLoading && !preview ? (
         <p className="text-xs text-slate-400">
           Submit a prompt to preview token movements, gas, approval scope, and risk signals.
