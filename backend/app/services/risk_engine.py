@@ -20,6 +20,23 @@ PROTOCOL_TRUST_SCORES = {
 
 
 class RiskEngine:
+    def _check_wallet_drain_patterns(self, actions: list[ProposedAction]) -> list[RiskFinding]:
+        findings: list[RiskFinding] = []
+        for action in actions:
+            if action.wallet_balance_usd <= 0:
+                continue
+            ratio = action.amount_usd / action.wallet_balance_usd
+            if ratio >= 0.75:
+                findings.append(
+                    self._finding(
+                        "wallet_drain_patterns",
+                        "high",
+                        RISK_WEIGHTS["wallet_drain_patterns"],
+                        f"Action {action.id} spends {ratio:.0%} of wallet balance, indicating drain risk.",
+                    )
+                )
+        return findings
+
     def _check_protocol_trust_score(self, actions: list[ProposedAction]) -> list[RiskFinding]:
         findings: list[RiskFinding] = []
         for action in actions:
@@ -93,6 +110,7 @@ class RiskEngine:
         findings.extend(self._check_unlimited_approvals(actions))
         findings.extend(self._check_malicious_contract_patterns(actions))
         findings.extend(self._check_protocol_trust_score(actions))
+        findings.extend(self._check_wallet_drain_patterns(actions))
         total_score = sum(item.score_impact for item in findings)
         risk_score = min(100, total_score)
         explanation = "Risk engine found no high-risk patterns in the proposed actions."
