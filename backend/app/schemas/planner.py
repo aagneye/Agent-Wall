@@ -39,3 +39,11 @@ class PlannerResponse(BaseModel):
     safety_note: str
     deterministic: bool = True
     actions: list[PlannerAction] = Field(min_length=1, max_length=5)
+
+    @field_validator("actions")
+    @classmethod
+    def validate_unique_actions(cls, value: list[PlannerAction]) -> list[PlannerAction]:
+        types = [item.type for item in value]
+        if len(types) != len(set(types)):
+            raise ValueError("Planner actions must be unique.")
+        return value
