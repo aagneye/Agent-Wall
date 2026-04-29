@@ -12,6 +12,7 @@ export function ConsoleShell({ children }: ConsoleShellProps) {
         <span className="h-2.5 w-2.5 rounded-full bg-amber-300/80" />
         <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
         <p className="ml-2 text-xs text-slate-400">secure-agent-console</p>
+        <p className="ml-auto text-[11px] text-cyan-300/70">guardrail mode: strict</p>
       </div>
       {children}
     </section>
