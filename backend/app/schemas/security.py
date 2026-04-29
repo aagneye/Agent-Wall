@@ -55,3 +55,10 @@ class SecurityEvaluationResponse(BaseModel):
     approval_recommendation: Literal["approve", "needs_human_review", "reject"]
     risk_findings: list[RiskFinding]
     policy_findings: list[PolicyFinding]
+
+    @field_validator("risk_findings", "policy_findings")
+    @classmethod
+    def ensure_non_empty_findings(cls, value: list[BaseModel]) -> list[BaseModel]:
+        if len(value) == 0:
+            raise ValueError("At least one finding is required for explainability.")
+        return value
