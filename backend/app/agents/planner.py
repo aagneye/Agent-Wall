@@ -65,7 +65,8 @@ class PlannerAgent:
         if not requested:
             requested = ["check_protocol_options", "deposit_funds"]
 
-        return requested
+        # Keep deterministic order and remove accidental duplicates.
+        return list(dict.fromkeys(requested))
 
     def plan(self, payload: PlannerRequest) -> PlannerResponse:
         if self._is_unsafe_prompt(payload.prompt):
