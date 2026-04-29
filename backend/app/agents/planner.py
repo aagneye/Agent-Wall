@@ -20,8 +20,11 @@ DEFAULT_ACTION_ORDER = [
 
 
 class PlannerAgent:
+    def _normalize_prompt(self, prompt: str) -> str:
+        return " ".join(prompt.lower().split())
+
     def _is_unsafe_prompt(self, prompt: str) -> bool:
-        lowered = prompt.lower()
+        lowered = self._normalize_prompt(prompt)
         return any(pattern in lowered for pattern in UNSAFE_PROMPT_PATTERNS)
 
     def _safe_fallback_actions(self) -> list[str]:
@@ -52,7 +55,7 @@ class PlannerAgent:
         )
 
     def _extract_requested_actions(self, prompt: str) -> list[str]:
-        lowered = prompt.lower()
+        lowered = self._normalize_prompt(prompt)
         requested: list[str] = []
         for action_type in DEFAULT_ACTION_ORDER:
             action_hint = action_type.replace("_", " ")
