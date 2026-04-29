@@ -21,7 +21,12 @@ export function AgentConsole() {
           <ConsoleShell>
             <div className="space-y-4">
               <PromptInput value={prompt} disabled={status === "loading"} onChange={setPrompt} />
-              <SubmitBar isLoading={status === "loading"} error={error} onSubmit={submitPrompt} />
+              <SubmitBar
+                isLoading={status === "loading"}
+                status={status}
+                error={error}
+                onSubmit={submitPrompt}
+              />
             </div>
           </ConsoleShell>
           <div className="space-y-4">
