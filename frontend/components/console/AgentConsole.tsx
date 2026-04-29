@@ -1,11 +1,14 @@
 "use client";
 
 import { ActivityLog } from "@/components/console/ActivityLog";
+import { ApprovalModal } from "@/components/console/ApprovalModal";
 import { ConsoleHeader } from "@/components/console/ConsoleHeader";
 import { ConsoleShell } from "@/components/console/ConsoleShell";
+import { PanicButton } from "@/components/console/PanicButton";
 import { PromptHistory } from "@/components/console/PromptHistory";
 import { PromptInput } from "@/components/console/PromptInput";
 import { RecentActions } from "@/components/console/RecentActions";
+import { RiskCard } from "@/components/console/RiskCard";
 import { SubmitBar } from "@/components/console/SubmitBar";
 import { TransactionPreview } from "@/components/console/TransactionPreview";
 import { useAgentConsole } from "@/components/console/use-agent-console";
@@ -21,7 +24,8 @@ export function AgentConsole() {
     activityLog,
     promptHistory,
     preview,
-    isSimulationLoading
+    isSimulationLoading,
+    approvalContext
   } = useAgentConsole();
 
   return (
@@ -49,11 +53,14 @@ export function AgentConsole() {
             <RecentActions items={actions} />
             <PromptHistory items={promptHistory} />
             <TransactionPreview preview={preview} isLoading={isSimulationLoading} />
+            <RiskCard context={approvalContext} />
+            <PanicButton onPanic={() => undefined} />
           </div>
         </div>
         <div className="grid gap-4">
           <ActivityLog logs={activityLog} />
         </div>
+        <ApprovalModal open={false} context={approvalContext} onApprove={() => undefined} onReject={() => undefined} onClose={() => undefined} />
       </section>
     </main>
   );
