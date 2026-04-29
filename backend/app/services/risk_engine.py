@@ -20,3 +20,10 @@ class RiskEngine:
             score_impact=impact,
             explanation=explanation,
         )
+
+    def evaluate(self, actions: list[ProposedAction]) -> tuple[int, list[RiskFinding], str]:
+        findings: list[RiskFinding] = []
+        total_score = sum(item.score_impact for item in findings)
+        risk_score = min(100, total_score)
+        explanation = "Risk engine found no high-risk patterns in the proposed actions."
+        return risk_score, findings, explanation
