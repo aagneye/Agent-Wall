@@ -17,3 +17,17 @@ export type ActivityLogItem = {
   level: "info" | "success" | "warning" | "error";
   timestamp: string;
 };
+
+export type TransactionPreviewData = {
+  deterministic: boolean;
+  tokenMovements: Array<{
+    token: string;
+    direction: "in" | "out";
+    amountUsd: number;
+  }>;
+  gasEstimateUsd: number;
+  approvalSizeUsd: number;
+  failureRisk: "low" | "medium" | "high";
+  suspiciousBehaviorDetected: boolean;
+  humanExplanation: string;
+};
