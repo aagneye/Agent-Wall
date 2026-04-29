@@ -17,7 +17,9 @@ export function Web3Provider({ children }: Web3ProviderProps) {
   return (
     <WagmiProvider config={walletConfig}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider>{children}</RainbowKitProvider>
+        <RainbowKitProvider modalSize="compact" coolMode>
+          {children}
+        </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );
