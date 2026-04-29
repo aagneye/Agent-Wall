@@ -38,6 +38,10 @@ export function AgentConsole() {
     <main className="min-h-screen px-6 py-14 text-slate-100">
       <section className="mx-auto flex w-full max-w-7xl flex-col gap-8">
         <ConsoleHeader />
+        <div className="card-elevated rounded-xl p-3 text-xs text-slate-300">
+          Demo tip: start with <span className="text-slate-100">"Optimize my USDC yield safely"</span> to
+          showcase full plan, simulation, and approval flow in under 30 seconds.
+        </div>
         <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
           <ConsoleShell>
             <div className="space-y-4">
