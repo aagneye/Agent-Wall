@@ -61,6 +61,12 @@ export function AgentConsole() {
             <TransactionPreview preview={preview} isLoading={isSimulationLoading} />
             <RiskCard context={approvalContext} />
             <PanicButton onPanic={triggerPanicLock} disabled={panicLockEnabled} />
+            {panicLockEnabled ? (
+              <div className="rounded-xl border border-rose-400/40 bg-rose-950/40 p-3 text-xs text-rose-200">
+                <p className="font-semibold">Emergency Lock Mode Enabled</p>
+                <p className="mt-1">All agent actions are frozen until manual reset.</p>
+              </div>
+            ) : null}
           </div>
         </div>
         <div className="grid gap-4">
