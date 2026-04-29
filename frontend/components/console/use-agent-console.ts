@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { initialActivityLog, initialRecentActions } from "@/components/console/seed-data";
 import type { ActivityLogItem, AgentActionItem, AgentRunStatus } from "@/components/console/types";
+import { validatePromptInput } from "@/components/console/validation";
 
 export function useAgentConsole() {
   const [prompt, setPrompt] = useState("");
@@ -26,4 +27,8 @@ export function useAgentConsole() {
     activityLog,
     setActivityLog
   };
+}
+
+export function validateConsolePrompt(prompt: string): string | null {
+  return validatePromptInput(prompt);
 }
