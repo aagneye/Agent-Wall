@@ -5,6 +5,7 @@ import { StatusPill } from "@/components/ui/status-pill";
 import { ENFORCED_CHAIN_NAME } from "@/lib/wallet/chains";
 import { shortAddress } from "@/lib/wallet/format";
 import { useBaseEnforcement } from "@/hooks/use-base-enforcement";
+import { useSafeAccountPreparation } from "@/hooks/use-safe-account-preparation";
 import { useTransactionStatusPrep } from "@/hooks/use-transaction-status-prep";
 import { useWalletStatus } from "@/hooks/use-wallet-status";
 
@@ -12,6 +13,7 @@ export function WalletStatus() {
   const { address, chainId, isConnected, isOnEnforcedChain } = useWalletStatus();
   const { isSwitchingChain } = useBaseEnforcement();
   const { state } = useTransactionStatusPrep();
+  const { safePreparation, isLoadingSafePreparation } = useSafeAccountPreparation();
 
   return (
     <GlassPanel className="flex flex-col gap-4">
@@ -37,6 +39,12 @@ export function WalletStatus() {
         <div className="flex items-center gap-2">
           <span>Transaction State:</span>
           <StatusPill tone={state.status === "failed" ? "danger" : "neutral"}>{state.status}</StatusPill>
+        </div>
+        <div className="flex items-center gap-2">
+          <span>Safe Preparation:</span>
+          <StatusPill tone={safePreparation?.status === "prepared" ? "success" : "neutral"}>
+            {isLoadingSafePreparation ? "Loading" : safePreparation?.status ?? "unprepared"}
+          </StatusPill>
         </div>
       </div>
     </GlassPanel>
