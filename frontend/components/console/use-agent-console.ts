@@ -33,9 +33,19 @@ export function useAgentConsole() {
 
     setStatus("loading");
     setError(null);
+    setIsSimulationLoading(true);
 
     try {
       const response = await submitAgentPrompt({ prompt: prompt.trim() });
+      const simulation = await simulateTransaction({
+        action_label: prompt.trim(),
+        protocol: "uniswap",
+        token_symbol: "USDC",
+        amount_usd: 50,
+        approval_scope: "limited",
+        approval_duration_hours: 24,
+        target: "Uniswap"
+      });
       setPromptHistory((previous) => [prompt.trim(), ...previous].slice(0, 8));
       setActions((previous) => [
         {
@@ -55,6 +65,7 @@ export function useAgentConsole() {
         },
         ...previous
       ].slice(0, 12));
+      setPreview(toTransactionPreviewData(simulation));
       setStatus("success");
       setPrompt("");
     } catch {
@@ -69,6 +80,8 @@ export function useAgentConsole() {
         },
         ...previous
       ].slice(0, 12));
+    } finally {
+      setIsSimulationLoading(false);
     }
   }
 
