@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     SUPABASE_URL: str = ""
     SUPABASE_SERVICE_ROLE_KEY: str = ""
     DATABASE_URL: str = ""
+    SAFE_TX_SERVICE_URL: str = ""
+    SAFE_FACTORY_ADDRESS: str = ""
 
     model_config = SettingsConfigDict(
         env_file=".env",
