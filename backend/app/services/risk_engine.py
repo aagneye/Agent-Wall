@@ -20,6 +20,20 @@ PROTOCOL_TRUST_SCORES = {
 
 
 class RiskEngine:
+    def _check_unusual_transaction_size(self, actions: list[ProposedAction]) -> list[RiskFinding]:
+        findings: list[RiskFinding] = []
+        for action in actions:
+            if action.amount_usd >= 50_000:
+                findings.append(
+                    self._finding(
+                        "unusual_transaction_size",
+                        "medium",
+                        RISK_WEIGHTS["unusual_transaction_size"],
+                        f"Action {action.id} has an unusually large transaction size (${action.amount_usd:,.0f}).",
+                    )
+                )
+        return findings
+
     def _check_wallet_drain_patterns(self, actions: list[ProposedAction]) -> list[RiskFinding]:
         findings: list[RiskFinding] = []
         for action in actions:
@@ -111,6 +125,7 @@ class RiskEngine:
         findings.extend(self._check_malicious_contract_patterns(actions))
         findings.extend(self._check_protocol_trust_score(actions))
         findings.extend(self._check_wallet_drain_patterns(actions))
+        findings.extend(self._check_unusual_transaction_size(actions))
         total_score = sum(item.score_impact for item in findings)
         risk_score = min(100, total_score)
         explanation = "Risk engine found no high-risk patterns in the proposed actions."
