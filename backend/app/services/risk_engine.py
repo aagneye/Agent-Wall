@@ -172,6 +172,15 @@ class RiskEngine:
         findings.extend(self._check_unusual_transaction_size(actions))
         findings.extend(self._check_unknown_address_interactions(actions))
         findings.extend(self._check_approval_scope_risk(actions))
+        if not findings:
+            findings.append(
+                self._finding(
+                    "baseline_safe_assessment",
+                    "low",
+                    0,
+                    "No high-risk indicators were triggered across configured deterministic rules.",
+                )
+            )
         total_score = sum(item.score_impact for item in findings)
         risk_score = min(100, total_score)
         explanation = self._summarize(findings, risk_score)
