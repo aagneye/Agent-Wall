@@ -13,6 +13,22 @@ RISK_WEIGHTS = {
 
 
 class RiskEngine:
+    def _check_malicious_contract_patterns(self, actions: list[ProposedAction]) -> list[RiskFinding]:
+        findings: list[RiskFinding] = []
+        suspicious_markers = ("dead", "beef", "bad", "rug")
+        for action in actions:
+            normalized = action.contract_address.lower()
+            if any(marker in normalized for marker in suspicious_markers):
+                findings.append(
+                    self._finding(
+                        "malicious_contract_patterns",
+                        "high",
+                        RISK_WEIGHTS["malicious_contract_patterns"],
+                        f"Action {action.id} contract pattern is flagged as potentially malicious.",
+                    )
+                )
+        return findings
+
     def _check_unlimited_approvals(self, actions: list[ProposedAction]) -> list[RiskFinding]:
         findings: list[RiskFinding] = []
         for action in actions:
@@ -53,6 +69,7 @@ class RiskEngine:
         findings: list[RiskFinding] = []
         findings.extend(self._check_suspicious_approvals(actions))
         findings.extend(self._check_unlimited_approvals(actions))
+        findings.extend(self._check_malicious_contract_patterns(actions))
         total_score = sum(item.score_impact for item in findings)
         risk_score = min(100, total_score)
         explanation = "Risk engine found no high-risk patterns in the proposed actions."
