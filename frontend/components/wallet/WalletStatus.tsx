@@ -4,10 +4,12 @@ import { GlassPanel } from "@/components/ui/glass-panel";
 import { StatusPill } from "@/components/ui/status-pill";
 import { ENFORCED_CHAIN_NAME } from "@/lib/wallet/chains";
 import { shortAddress } from "@/lib/wallet/format";
+import { useBaseEnforcement } from "@/hooks/use-base-enforcement";
 import { useWalletStatus } from "@/hooks/use-wallet-status";
 
 export function WalletStatus() {
   const { address, chainId, isConnected, isOnEnforcedChain } = useWalletStatus();
+  const { isSwitchingChain } = useBaseEnforcement();
 
   return (
     <GlassPanel className="flex flex-col gap-4">
@@ -27,6 +29,9 @@ export function WalletStatus() {
             {isOnEnforcedChain ? `On ${ENFORCED_CHAIN_NAME}` : "Switch Required"}
           </StatusPill>
         </div>
+        {isSwitchingChain ? (
+          <p className="text-xs text-amber-300">Switching network to Base...</p>
+        ) : null}
       </div>
     </GlassPanel>
   );
