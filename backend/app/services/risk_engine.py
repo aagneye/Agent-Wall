@@ -11,8 +11,30 @@ RISK_WEIGHTS = {
     "approval_scope_risk": 10,
 }
 
+PROTOCOL_TRUST_SCORES = {
+    "aave": 90,
+    "compound": 88,
+    "morpho": 80,
+    "unknown": 35,
+}
+
 
 class RiskEngine:
+    def _check_protocol_trust_score(self, actions: list[ProposedAction]) -> list[RiskFinding]:
+        findings: list[RiskFinding] = []
+        for action in actions:
+            trust_score = PROTOCOL_TRUST_SCORES.get(action.protocol.lower(), PROTOCOL_TRUST_SCORES["unknown"])
+            if trust_score < 60:
+                findings.append(
+                    self._finding(
+                        "protocol_trust_score",
+                        "medium",
+                        RISK_WEIGHTS["protocol_trust_score"],
+                        f"Action {action.id} targets protocol with low trust score ({trust_score}/100).",
+                    )
+                )
+        return findings
+
     def _check_malicious_contract_patterns(self, actions: list[ProposedAction]) -> list[RiskFinding]:
         findings: list[RiskFinding] = []
         suspicious_markers = ("dead", "beef", "bad", "rug")
@@ -70,6 +92,7 @@ class RiskEngine:
         findings.extend(self._check_suspicious_approvals(actions))
         findings.extend(self._check_unlimited_approvals(actions))
         findings.extend(self._check_malicious_contract_patterns(actions))
+        findings.extend(self._check_protocol_trust_score(actions))
         total_score = sum(item.score_impact for item in findings)
         risk_score = min(100, total_score)
         explanation = "Risk engine found no high-risk patterns in the proposed actions."
