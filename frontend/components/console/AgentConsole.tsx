@@ -39,7 +39,9 @@ export function AgentConsole() {
             <PromptHistory items={promptHistory} />
           </div>
         </div>
-        <ActivityLog logs={activityLog} />
+        <div className="grid gap-4">
+          <ActivityLog logs={activityLog} />
+        </div>
       </section>
     </main>
   );
