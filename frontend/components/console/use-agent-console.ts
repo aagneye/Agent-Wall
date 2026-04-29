@@ -29,6 +29,19 @@ export function useAgentConsole() {
   const [approvalContext, setApprovalContext] = useState<ApprovalContext | null>(null);
   const [panicLockEnabled, setPanicLockEnabled] = useState(false);
 
+  function buildApprovalContext(): ApprovalContext {
+    return {
+      title: "Agent Firewall Approval Request",
+      explanation: "This action allows spending up to $50 USDC for Uniswap only for 24 hours.",
+      riskLevel: "safe",
+      policyDetails: [
+        { label: "Spending Cap", value: "$50 (within cap)", pass: true },
+        { label: "Protocol Allowlist", value: "Uniswap approved", pass: true },
+        { label: "Approval Expiry", value: "24 hours", pass: true }
+      ]
+    };
+  }
+
   async function submitPrompt(): Promise<void> {
     const validationError = validatePromptInput(prompt);
     if (validationError) {
@@ -72,6 +85,9 @@ export function useAgentConsole() {
         ...previous
       ].slice(0, 12));
       setPreview(toTransactionPreviewData(simulation));
+      setApprovalContext(buildApprovalContext());
+      setApprovalOpen(true);
+      setApprovalDecision("pending");
       setStatus("success");
       setPrompt("");
     } catch {
@@ -86,9 +102,53 @@ export function useAgentConsole() {
         },
         ...previous
       ].slice(0, 12));
+      setApprovalOpen(false);
     } finally {
       setIsSimulationLoading(false);
     }
+  }
+
+  function approveAction(): void {
+    setApprovalDecision("approved");
+    setApprovalOpen(false);
+    setActivityLog((previous) => [
+      {
+        id: crypto.randomUUID(),
+        message: "Approval granted by user. Execution remains guarded by policy engine.",
+        level: "success",
+        timestamp: new Date().toLocaleTimeString("en-US", { hour12: false })
+      },
+      ...previous
+    ].slice(0, 12));
+  }
+
+  function rejectAction(): void {
+    setApprovalDecision("rejected");
+    setApprovalOpen(false);
+    setActivityLog((previous) => [
+      {
+        id: crypto.randomUUID(),
+        message: "Approval rejected by user. Action has been safely halted.",
+        level: "warning",
+        timestamp: new Date().toLocaleTimeString("en-US", { hour12: false })
+      },
+      ...previous
+    ].slice(0, 12));
+  }
+
+  function triggerPanicLock(): void {
+    setPanicLockEnabled(true);
+    setApprovalOpen(false);
+    setApprovalDecision("rejected");
+    setActivityLog((previous) => [
+      {
+        id: crypto.randomUUID(),
+        message: "Emergency lock activated: permissions revoked and agent actions frozen.",
+        level: "error",
+        timestamp: new Date().toLocaleTimeString("en-US", { hour12: false })
+      },
+      ...previous
+    ].slice(0, 12));
   }
 
   return {
@@ -116,6 +176,9 @@ export function useAgentConsole() {
     setApprovalContext,
     panicLockEnabled,
     setPanicLockEnabled,
+    approveAction,
+    rejectAction,
+    triggerPanicLock,
     submitPrompt
   };
 }
