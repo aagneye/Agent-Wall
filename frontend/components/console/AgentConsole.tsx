@@ -25,7 +25,13 @@ export function AgentConsole() {
     promptHistory,
     preview,
     isSimulationLoading,
-    approvalContext
+    approvalContext,
+    approvalOpen,
+    approveAction,
+    rejectAction,
+    setApprovalOpen,
+    triggerPanicLock,
+    panicLockEnabled
   } = useAgentConsole();
 
   return (
@@ -54,13 +60,19 @@ export function AgentConsole() {
             <PromptHistory items={promptHistory} />
             <TransactionPreview preview={preview} isLoading={isSimulationLoading} />
             <RiskCard context={approvalContext} />
-            <PanicButton onPanic={() => undefined} />
+            <PanicButton onPanic={triggerPanicLock} disabled={panicLockEnabled} />
           </div>
         </div>
         <div className="grid gap-4">
           <ActivityLog logs={activityLog} />
         </div>
-        <ApprovalModal open={false} context={approvalContext} onApprove={() => undefined} onReject={() => undefined} onClose={() => undefined} />
+        <ApprovalModal
+          open={approvalOpen}
+          context={approvalContext}
+          onApprove={approveAction}
+          onReject={rejectAction}
+          onClose={() => setApprovalOpen(false)}
+        />
       </section>
     </main>
   );
