@@ -18,7 +18,7 @@ export function ApprovalModal({ open, context, onApprove, onReject, onClose }: A
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-xl rounded-2xl border border-slate-200/15 bg-slate-950 p-5 shadow-2xl shadow-cyan-500/10">
+      <div className="w-full max-w-xl rounded-2xl border border-slate-200/15 bg-gradient-to-br from-slate-950 to-slate-900 p-5 shadow-2xl shadow-cyan-500/10">
         <h2 className="text-lg font-semibold text-slate-100">{context.title}</h2>
         <p className={`mt-2 text-xs font-medium ${isRisky ? "text-rose-300" : "text-emerald-300"}`}>
           {isRisky ? "Risk Indicator: Risky" : "Risk Indicator: Safe"}
@@ -36,7 +36,9 @@ export function ApprovalModal({ open, context, onApprove, onReject, onClose }: A
         <div className="mt-4 flex items-center justify-end gap-2">
           <Button variant="secondary" onClick={onClose}>Close</Button>
           <Button variant="secondary" onClick={onReject}>Reject</Button>
-          <Button onClick={onApprove}>Approve</Button>
+          <Button className={isRisky ? "bg-amber-500 hover:bg-amber-400" : undefined} onClick={onApprove}>
+            {isRisky ? "Approve With Caution" : "Approve"}
+          </Button>
         </div>
       </div>
     </div>
