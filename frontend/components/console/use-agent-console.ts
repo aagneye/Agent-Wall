@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { initialActivityLog, initialRecentActions } from "@/components/console/seed-data";
 import type {
+  ApprovalContext,
+  ApprovalDecision,
   ActivityLogItem,
   AgentActionItem,
   AgentRunStatus,
@@ -22,6 +24,10 @@ export function useAgentConsole() {
   const [activityLog, setActivityLog] = useState<ActivityLogItem[]>(initialActivityLog);
   const [preview, setPreview] = useState<TransactionPreviewData | null>(null);
   const [isSimulationLoading, setIsSimulationLoading] = useState(false);
+  const [approvalOpen, setApprovalOpen] = useState(false);
+  const [approvalDecision, setApprovalDecision] = useState<ApprovalDecision>("pending");
+  const [approvalContext, setApprovalContext] = useState<ApprovalContext | null>(null);
+  const [panicLockEnabled, setPanicLockEnabled] = useState(false);
 
   async function submitPrompt(): Promise<void> {
     const validationError = validatePromptInput(prompt);
@@ -102,6 +108,14 @@ export function useAgentConsole() {
     setPreview,
     isSimulationLoading,
     setIsSimulationLoading,
+    approvalOpen,
+    setApprovalOpen,
+    approvalDecision,
+    setApprovalDecision,
+    approvalContext,
+    setApprovalContext,
+    panicLockEnabled,
+    setPanicLockEnabled,
     submitPrompt
   };
 }
