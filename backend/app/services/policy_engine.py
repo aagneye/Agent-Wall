@@ -7,6 +7,14 @@ APPROVAL_MAX_MINUTES = 1_440
 
 
 class PolicyEngine:
+    def _recommend(self, risk_score: int, findings: list[PolicyFinding]) -> str:
+        any_failed = any(not item.passed for item in findings)
+        if risk_score >= 80:
+            return "reject"
+        if risk_score >= 35 or any_failed:
+            return "needs_human_review"
+        return "approve"
+
     def _enforce_human_approval_threshold(self, risk_score: int) -> PolicyFinding:
         passed = risk_score < HUMAN_APPROVAL_THRESHOLD
         return PolicyFinding(
@@ -69,5 +77,5 @@ class PolicyEngine:
             self._enforce_human_approval_threshold(risk_score),
             self._enforce_approval_expiration(actions),
         ]
-        recommendation = "approve" if risk_score < 35 else "needs_human_review"
+        recommendation = self._recommend(risk_score, findings)
         return findings, recommendation
