@@ -38,15 +38,17 @@ DATABASE_URL=postgresql://postgres:JKNj*(4h%23h%25%5Eh%26@db.yqbuwydvkodptfixjxd
 
 ### 3. Create initial migration
 
+`migrations/env.py` doubles `%` characters in `DATABASE_URL` when passing it to Alembic’s INI layer, because Python’s `ConfigParser` treats `%` as interpolation syntax (URL-encoded passwords are common).
+
 ```bash
 cd backend
-alembic revision --autogenerate -m "Initial schema"
+python -m alembic revision --autogenerate -m "Initial schema"
 ```
 
 ### 4. Apply migrations to database
 
 ```bash
-alembic upgrade head
+python -m alembic upgrade head
 ```
 
 ### 5. Verify tables were created
@@ -63,19 +65,19 @@ You should see: `agent_runs`, `security_evaluations`, `proposed_actions`, `audit
 
 ```bash
 # Create a new migration after changing models
-alembic revision --autogenerate -m "description of change"
+python -m alembic revision --autogenerate -m "description of change"
 
 # Apply all pending migrations
-alembic upgrade head
+python -m alembic upgrade head
 
 # Rollback one migration
-alembic downgrade -1
+python -m alembic downgrade -1
 
 # Show current migration version
-alembic current
+python -m alembic current
 
 # Show migration history
-alembic history
+python -m alembic history
 ```
 
 ## Security Notes

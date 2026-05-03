@@ -32,11 +32,12 @@ Choose one method:
 ```powershell
 cd "C:\Projects\Agnet Wall\backend"
 
-# Create initial migration
-& ".\.venv\Scripts\alembic.exe" revision --autogenerate -m "Initial schema"
+# Ensure Alembic is installed in this venv (creates alembic.exe under Scripts\)
+& ".\.venv\Scripts\python.exe" -m pip install -r requirements.txt
 
-# Apply migration to Supabase
-& ".\.venv\Scripts\alembic.exe" upgrade head
+# Migrations (use module form; reliable on all shells)
+& ".\.venv\Scripts\python.exe" -m alembic revision --autogenerate -m "Initial schema"
+& ".\.venv\Scripts\python.exe" -m alembic upgrade head
 ```
 
 ### Option B: Direct creation (Quick for development)

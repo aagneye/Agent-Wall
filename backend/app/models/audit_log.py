@@ -13,7 +13,8 @@ class AuditLog(Base):
     event_type: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
     wallet_address: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
     description: Mapped[str] = mapped_column(Text, nullable=False)
-    metadata: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    # "metadata" is reserved on Declarative Base; DB column stays "metadata".
+    event_metadata: Mapped[dict | None] = mapped_column("metadata", JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
