@@ -11,9 +11,8 @@ import type {
   TransactionPreviewData
 } from "@/components/console/types";
 import { validatePromptInput } from "@/components/console/validation";
-import { toTransactionPreviewData } from "@/components/console/preview-format";
 import { submitAgentPrompt } from "@/lib/api/agent-console";
-import { simulateTransaction } from "@/lib/api/tenderly";
+import { simulatePreview } from "@/lib/api/preview";
 
 export function useAgentConsole() {
   const [prompt, setPrompt] = useState("");
@@ -62,15 +61,7 @@ export function useAgentConsole() {
 
     try {
       const response = await submitAgentPrompt({ prompt: prompt.trim() });
-      const simulation = await simulateTransaction({
-        action_label: prompt.trim(),
-        protocol: "uniswap",
-        token_symbol: "USDC",
-        amount_usd: 50,
-        approval_scope: "limited",
-        approval_duration_hours: 24,
-        target: "Uniswap"
-      });
+      const previewResult = await simulatePreview({ prompt: prompt.trim() });
       setPromptHistory((previous) => [prompt.trim(), ...previous].slice(0, 8));
       setActions((previous) => [
         {
@@ -90,7 +81,7 @@ export function useAgentConsole() {
         },
         ...previous
       ].slice(0, 12));
-      setPreview(toTransactionPreviewData(simulation));
+      setPreview(previewResult);
       setApprovalContext(buildApprovalContext());
       setApprovalOpen(true);
       setApprovalDecision("pending");

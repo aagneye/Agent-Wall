@@ -20,7 +20,7 @@ export function TransactionPreview({ preview, isLoading = false }: TransactionPr
       <h2 className="mb-3 text-sm font-semibold text-slate-100">Transaction Preview</h2>
       {isLoading ? (
         <div className="space-y-2">
-          <p className="loading-pulse text-xs text-cyan-300">Running deterministic Tenderly simulation...</p>
+          <p className="loading-pulse text-xs text-cyan-300">Generating transaction preview...</p>
           <div className="loading-pulse h-2 rounded bg-slate-800/80" />
           <div className="loading-pulse h-2 w-3/4 rounded bg-slate-800/80" />
         </div>
