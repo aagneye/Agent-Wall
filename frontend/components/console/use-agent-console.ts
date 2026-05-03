@@ -5,6 +5,7 @@ import { initialActivityLog, initialRecentActions } from "@/components/console/s
 import type { ApprovalDecision, ActivityLogItem, AgentActionItem, AgentRunStatus } from "@/components/console/types";
 import { validatePromptInput } from "@/components/console/validation";
 import { submitAgentPrompt } from "@/lib/api/agent-console";
+import { explainTransaction } from "@/lib/api/explain";
 import { createPlan, type PlannerResponse } from "@/lib/api/planner";
 import { evaluateSecurity, type SecurityEvaluationResponse } from "@/lib/api/security";
 
@@ -20,6 +21,7 @@ export function useAgentConsole() {
   const [approvalDecision, setApprovalDecision] = useState<ApprovalDecision>("pending");
   const [approvalPlan, setApprovalPlan] = useState<PlannerResponse | null>(null);
   const [approvalSecurity, setApprovalSecurity] = useState<SecurityEvaluationResponse | null>(null);
+  const [approvalExplanation, setApprovalExplanation] = useState<string | null>(null);
   const [panicLockEnabled, setPanicLockEnabled] = useState(false);
 
   async function submitPrompt(): Promise<void> {
@@ -45,13 +47,16 @@ export function useAgentConsole() {
     try {
       setApprovalPlan(null);
       setApprovalSecurity(null);
+      setApprovalExplanation(null);
 
       const response = await submitAgentPrompt({ prompt: trimmed });
-      const plan = await createPlan({ prompt: trimmed, runId: response.runId });
-      const security = await evaluateSecurity({ plan, runId: response.runId });
+      const planResult = await createPlan({ prompt: trimmed, runId: response.runId });
+      const securityResult = await evaluateSecurity({ plan: planResult, runId: response.runId });
+      const { explanation } = await explainTransaction({ plan: planResult, security: securityResult });
 
-      setApprovalPlan(plan);
-      setApprovalSecurity(security);
+      setApprovalPlan(planResult);
+      setApprovalSecurity(securityResult);
+      setApprovalExplanation(explanation);
 
       setPromptHistory((previous) => [trimmed, ...previous].slice(0, 8));
       setActions((previous) =>
@@ -97,6 +102,7 @@ export function useAgentConsole() {
       setApprovalOpen(false);
       setApprovalPlan(null);
       setApprovalSecurity(null);
+      setApprovalExplanation(null);
     } finally {
       setIsSimulationLoading(false);
     }
@@ -187,6 +193,7 @@ export function useAgentConsole() {
     setApprovalDecision,
     approvalPlan,
     approvalSecurity,
+    approvalExplanation,
     panicLockEnabled,
     setPanicLockEnabled,
     approveAction,
