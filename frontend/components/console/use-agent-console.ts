@@ -7,12 +7,29 @@ import type {
   ApprovalDecision,
   ActivityLogItem,
   AgentActionItem,
-  AgentRunStatus,
-  TransactionPreviewData
+  AgentRunStatus
 } from "@/components/console/types";
 import { validatePromptInput } from "@/components/console/validation";
 import { submitAgentPrompt } from "@/lib/api/agent-console";
-import { simulatePreview } from "@/lib/api/preview";
+import { createPlan, type PlannerResponse } from "@/lib/api/planner";
+import { evaluateSecurity, type SecurityEvaluationResponse } from "@/lib/api/security";
+
+function toApprovalContext(plan: PlannerResponse, sec: SecurityEvaluationResponse): ApprovalContext {
+  const risky = sec.approval_recommendation !== "approve";
+  return {
+    title: "Agent Firewall Approval Request",
+    explanation: `${plan.safety_note}\n\n${sec.risk_explanation}`,
+    riskLevel: risky ? "risky" : "safe",
+    policyDetails: [
+      { label: "Risk score", value: `${sec.risk_score}/100`, pass: sec.risk_score < 55 },
+      ...sec.policy_findings.map((p) => ({
+        label: p.policy_id,
+        value: p.explanation.length > 90 ? `${p.explanation.slice(0, 90)}…` : p.explanation,
+        pass: p.passed
+      }))
+    ]
+  };
+}
 
 export function useAgentConsole() {
   const [prompt, setPrompt] = useState("");
@@ -21,25 +38,14 @@ export function useAgentConsole() {
   const [promptHistory, setPromptHistory] = useState<string[]>([]);
   const [actions, setActions] = useState<AgentActionItem[]>(initialRecentActions);
   const [activityLog, setActivityLog] = useState<ActivityLogItem[]>(initialActivityLog);
-  const [preview, setPreview] = useState<TransactionPreviewData | null>(null);
+  const [preview] = useState<null>(null);
   const [isSimulationLoading, setIsSimulationLoading] = useState(false);
   const [approvalOpen, setApprovalOpen] = useState(false);
   const [approvalDecision, setApprovalDecision] = useState<ApprovalDecision>("pending");
   const [approvalContext, setApprovalContext] = useState<ApprovalContext | null>(null);
+  const [approvalPlan, setApprovalPlan] = useState<PlannerResponse | null>(null);
+  const [approvalSecurity, setApprovalSecurity] = useState<SecurityEvaluationResponse | null>(null);
   const [panicLockEnabled, setPanicLockEnabled] = useState(false);
-
-  function buildApprovalContext(): ApprovalContext {
-    return {
-      title: "Agent Firewall Approval Request",
-      explanation: "This action allows spending up to $50 USDC for Uniswap only for 24 hours.",
-      riskLevel: "safe",
-      policyDetails: [
-        { label: "Spending Cap", value: "$50 (within cap)", pass: true },
-        { label: "Protocol Allowlist", value: "Uniswap approved", pass: true },
-        { label: "Approval Expiry", value: "24 hours", pass: true }
-      ]
-    };
-  }
 
   async function submitPrompt(): Promise<void> {
     if (panicLockEnabled) {
@@ -55,34 +61,44 @@ export function useAgentConsole() {
       return;
     }
 
+    const trimmed = prompt.trim();
+
     setStatus("loading");
     setError(null);
     setIsSimulationLoading(true);
 
     try {
-      const response = await submitAgentPrompt({ prompt: prompt.trim() });
-      const previewResult = await simulatePreview({ prompt: prompt.trim() });
-      setPromptHistory((previous) => [prompt.trim(), ...previous].slice(0, 8));
-      setActions((previous) => [
-        {
-          id: response.runId,
-          title: `Submitted: ${prompt.trim()}`,
-          timestamp: "just now",
-          status: "queued"
-        },
-        ...previous
-      ].slice(0, 6));
-      setActivityLog((previous) => [
-        {
-          id: response.runId,
-          message: response.message,
-          level: "success",
-          timestamp: new Date().toLocaleTimeString("en-US", { hour12: false })
-        },
-        ...previous
-      ].slice(0, 12));
-      setPreview(previewResult);
-      setApprovalContext(buildApprovalContext());
+      const response = await submitAgentPrompt({ prompt: trimmed });
+      const plan = await createPlan({ prompt: trimmed, runId: response.runId });
+      const security = await evaluateSecurity({ plan, runId: response.runId });
+
+      setApprovalPlan(plan);
+      setApprovalSecurity(security);
+      setApprovalContext(toApprovalContext(plan, security));
+
+      setPromptHistory((previous) => [trimmed, ...previous].slice(0, 8));
+      setActions((previous) =>
+        [
+          {
+            id: response.runId,
+            title: `Submitted: ${trimmed}`,
+            timestamp: "just now",
+            status: "queued" as const
+          },
+          ...previous
+        ].slice(0, 6)
+      );
+      setActivityLog((previous) =>
+        [
+          {
+            id: response.runId,
+            message: response.message,
+            level: "success" as const,
+            timestamp: new Date().toLocaleTimeString("en-US", { hour12: false })
+          },
+          ...previous
+        ].slice(0, 12)
+      );
       setApprovalOpen(true);
       setApprovalDecision("pending");
       setStatus("success");
@@ -90,16 +106,21 @@ export function useAgentConsole() {
     } catch {
       setStatus("error");
       setError("Request failed. Verify backend availability and try again.");
-      setActivityLog((previous) => [
-        {
-          id: crypto.randomUUID(),
-          message: "Prompt submission failed at API boundary.",
-          level: "error",
-          timestamp: new Date().toLocaleTimeString("en-US", { hour12: false })
-        },
-        ...previous
-      ].slice(0, 12));
+      setActivityLog((previous) =>
+        [
+          {
+            id: crypto.randomUUID(),
+            message: "Prompt submission failed at API boundary.",
+            level: "error" as const,
+            timestamp: new Date().toLocaleTimeString("en-US", { hour12: false })
+          },
+          ...previous
+        ].slice(0, 12)
+      );
       setApprovalOpen(false);
+      setApprovalPlan(null);
+      setApprovalSecurity(null);
+      setApprovalContext(null);
     } finally {
       setIsSimulationLoading(false);
     }
@@ -108,58 +129,66 @@ export function useAgentConsole() {
   function approveAction(): void {
     setApprovalDecision("approved");
     setApprovalOpen(false);
-    setActivityLog((previous) => [
-      {
-        id: crypto.randomUUID(),
-        message: "Approval granted by user. Execution remains guarded by policy engine.",
-        level: "success",
-        timestamp: new Date().toLocaleTimeString("en-US", { hour12: false })
-      },
-      ...previous
-    ].slice(0, 12));
+    setActivityLog((previous) =>
+      [
+        {
+          id: crypto.randomUUID(),
+          message: "Approval granted by user. Execution remains guarded by policy engine.",
+          level: "success" as const,
+          timestamp: new Date().toLocaleTimeString("en-US", { hour12: false })
+        },
+        ...previous
+      ].slice(0, 12)
+    );
   }
 
   function rejectAction(): void {
     setApprovalDecision("rejected");
     setApprovalOpen(false);
-    setActivityLog((previous) => [
-      {
-        id: crypto.randomUUID(),
-        message: "Approval rejected by user. Action has been safely halted.",
-        level: "warning",
-        timestamp: new Date().toLocaleTimeString("en-US", { hour12: false })
-      },
-      ...previous
-    ].slice(0, 12));
+    setActivityLog((previous) =>
+      [
+        {
+          id: crypto.randomUUID(),
+          message: "Approval rejected by user. Action has been safely halted.",
+          level: "warning" as const,
+          timestamp: new Date().toLocaleTimeString("en-US", { hour12: false })
+        },
+        ...previous
+      ].slice(0, 12)
+    );
   }
 
   function triggerPanicLock(): void {
     setPanicLockEnabled(true);
     setApprovalOpen(false);
     setApprovalDecision("rejected");
-    setActivityLog((previous) => [
-      {
-        id: crypto.randomUUID(),
-        message: "Emergency lock activated: permissions revoked and agent actions frozen.",
-        level: "error",
-        timestamp: new Date().toLocaleTimeString("en-US", { hour12: false })
-      },
-      ...previous
-    ].slice(0, 12));
+    setActivityLog((previous) =>
+      [
+        {
+          id: crypto.randomUUID(),
+          message: "Emergency lock activated: permissions revoked and agent actions frozen.",
+          level: "error" as const,
+          timestamp: new Date().toLocaleTimeString("en-US", { hour12: false })
+        },
+        ...previous
+      ].slice(0, 12)
+    );
   }
 
   function resetEmergencyLock(): void {
     setPanicLockEnabled(false);
     setError(null);
-    setActivityLog((previous) => [
-      {
-        id: crypto.randomUUID(),
-        message: "Emergency lock reset by user. Console returned to guarded normal mode.",
-        level: "info",
-        timestamp: new Date().toLocaleTimeString("en-US", { hour12: false })
-      },
-      ...previous
-    ].slice(0, 12));
+    setActivityLog((previous) =>
+      [
+        {
+          id: crypto.randomUUID(),
+          message: "Emergency lock reset by user. Console returned to guarded normal mode.",
+          level: "info" as const,
+          timestamp: new Date().toLocaleTimeString("en-US", { hour12: false })
+        },
+        ...previous
+      ].slice(0, 12)
+    );
   }
 
   return {
@@ -176,15 +205,14 @@ export function useAgentConsole() {
     activityLog,
     setActivityLog,
     preview,
-    setPreview,
     isSimulationLoading,
-    setIsSimulationLoading,
     approvalOpen,
     setApprovalOpen,
     approvalDecision,
     setApprovalDecision,
     approvalContext,
-    setApprovalContext,
+    approvalPlan,
+    approvalSecurity,
     panicLockEnabled,
     setPanicLockEnabled,
     approveAction,
