@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.v1.routes.agent_console import router as agent_console_router
+from app.api.v1.routes.execute import router as execute_router
 from app.api.v1.routes.explain import router as explain_router
 from app.api.v1.routes.health import router as health_router
 from app.api.v1.routes.planner import router as planner_router
@@ -14,3 +15,4 @@ api_router.include_router(planner_router, prefix="/agent/planner", tags=["planne
 api_router.include_router(security_router, prefix="/agent/security", tags=["security"])
 api_router.include_router(preview_router, prefix="/agent/preview", tags=["preview"])
 api_router.include_router(explain_router, prefix="/agent/explain", tags=["explain"])
+api_router.include_router(execute_router, prefix="/agent/execute", tags=["execute"])
