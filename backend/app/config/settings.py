@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     API_V1_PREFIX: str = "/api/v1"
 
     SUPABASE_URL: str = ""
-    SUPABASE_SERVICE_ROLE_KEY: str = ""
+    SUPABASE_ANON_KEY: str = ""
     DATABASE_URL: str = ""
     SAFE_TX_SERVICE_URL: str = ""
     SAFE_FACTORY_ADDRESS: str = ""

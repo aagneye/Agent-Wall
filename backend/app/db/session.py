@@ -3,5 +3,19 @@ from sqlalchemy.orm import sessionmaker
 
 from app.config.settings import settings
 
-engine = create_engine(settings.DATABASE_URL, pool_pre_ping=True)
+engine = create_engine(
+    settings.DATABASE_URL,
+    pool_pre_ping=True,
+    pool_size=5,
+    max_overflow=10
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+def get_db():
+    """Dependency for FastAPI routes to get database session."""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
