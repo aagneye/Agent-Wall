@@ -6,5 +6,6 @@ psycopg2-binary
 supabase
 python-dotenv
 alembic
+openai
 ruff
 mypy
