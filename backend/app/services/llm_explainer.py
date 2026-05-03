@@ -17,6 +17,8 @@ SYSTEM_PROMPT = (
     "direct. No jargon."
 )
 
+OPENAI_CHAT_MODEL = "gpt-4o-mini"
+
 
 async def explain_transaction(plan: dict, security: dict) -> str:
     """Return a concise explanation from GPT-4o-mini, or a fixed fallback string on failure."""
@@ -29,13 +31,15 @@ async def explain_transaction(plan: dict, security: dict) -> str:
     try:
         client = AsyncOpenAI(api_key=api_key)
         completion = await client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=OPENAI_CHAT_MODEL,
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": user_message},
             ],
         )
 
+        if not completion.choices:
+            return FALLBACK_EXPLANATION
         raw = completion.choices[0].message.content
         text = raw.strip() if raw else ""
 
