@@ -1,7 +1,27 @@
-export function ConsoleHeader() {
+"use client";
+
+import { StatusPill } from "@/components/ui/status-pill";
+
+type ConsoleHeaderProps = {
+  walletLabel: string;
+  isConnected: boolean;
+  isConnecting: boolean;
+};
+
+export function ConsoleHeader({ walletLabel, isConnected, isConnecting }: ConsoleHeaderProps) {
   return (
     <header className="flex flex-col gap-3">
-      <p className="text-xs uppercase tracking-[0.25em] text-cyan-300/80">Agent Firewall Console</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <p className="text-xs uppercase tracking-[0.25em] text-cyan-300/80">Agent Firewall Console</p>
+        <div className="flex flex-wrap items-center justify-end gap-2 text-right">
+          <StatusPill tone={isConnected ? "success" : isConnecting ? "neutral" : "neutral"}>
+            {isConnected ? "Wallet connected" : isConnecting ? "Connecting…" : "Wallet disconnected"}
+          </StatusPill>
+          <span className="max-w-[min(100%,14rem)] truncate text-xs font-medium text-slate-200" title={walletLabel}>
+            {walletLabel}
+          </span>
+        </div>
+      </div>
       <h1 className="text-4xl font-semibold tracking-tight text-slate-50">
         Autonomous execution, human control.
       </h1>

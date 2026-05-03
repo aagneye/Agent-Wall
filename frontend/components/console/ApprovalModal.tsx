@@ -8,6 +8,8 @@ type ApprovalModalProps = {
   security: SecurityEvaluationResponse | null;
   /** Plain-language summary from POST /agent/explain; omit or null shows a fallback hint. */
   explanation?: string | null;
+  /** ENS name or shortened address for approval signing context. */
+  signingIdentity?: string | null;
   onApprove: () => void;
   onReject: () => void;
   onClose: () => void;
@@ -35,6 +37,7 @@ export function ApprovalModal({
   plan,
   security,
   explanation = null,
+  signingIdentity = null,
   onApprove,
   onReject,
   onClose
@@ -119,7 +122,12 @@ export function ApprovalModal({
           <p className="mt-1 text-sm leading-snug">{security.policy_result.reason}</p>
         </div>
 
-        <div className="mt-4 flex items-center justify-end gap-2">
+        <p className="mt-4 text-xs text-slate-400">
+          Signing as:{" "}
+          <span className="font-semibold text-slate-200">{signingIdentity ?? "Not connected"}</span>
+        </p>
+
+        <div className="mt-3 flex items-center justify-end gap-2">
           <Button variant="secondary" onClick={onClose}>
             Close
           </Button>

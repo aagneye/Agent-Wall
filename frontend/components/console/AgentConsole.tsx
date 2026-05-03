@@ -12,8 +12,13 @@ import { RiskCard } from "@/components/console/RiskCard";
 import { SubmitBar } from "@/components/console/SubmitBar";
 import { TransactionPreview } from "@/components/console/TransactionPreview";
 import { useAgentConsole } from "@/components/console/use-agent-console";
+import { useResolvedWalletLabel } from "@/hooks/use-resolved-wallet-label";
+import { useWalletStatus } from "@/hooks/use-wallet-status";
 
 export function AgentConsole() {
+  const { isConnected, isConnecting } = useWalletStatus();
+  const walletLabel = useResolvedWalletLabel();
+
   const {
     prompt,
     setPrompt,
@@ -38,7 +43,11 @@ export function AgentConsole() {
   return (
     <main className="min-h-screen px-6 py-14 text-slate-100">
       <section className="mx-auto flex w-full max-w-7xl flex-col gap-8">
-        <ConsoleHeader />
+        <ConsoleHeader
+          walletLabel={walletLabel}
+          isConnected={isConnected}
+          isConnecting={isConnecting}
+        />
         <div className="card-elevated rounded-xl p-3 text-xs text-slate-300">
           Demo tip: start with{" "}
           <span className="text-slate-100">{"\u201cOptimize my USDC yield safely\u201d"}</span> to
@@ -83,6 +92,7 @@ export function AgentConsole() {
           plan={approvalPlan}
           security={approvalSecurity}
           explanation={approvalExplanation}
+          signingIdentity={walletLabel}
           onApprove={approveAction}
           onReject={rejectAction}
           onClose={() => setApprovalOpen(false)}
