@@ -2,34 +2,11 @@
 
 import { useState } from "react";
 import { initialActivityLog, initialRecentActions } from "@/components/console/seed-data";
-import type {
-  ApprovalContext,
-  ApprovalDecision,
-  ActivityLogItem,
-  AgentActionItem,
-  AgentRunStatus
-} from "@/components/console/types";
+import type { ApprovalDecision, ActivityLogItem, AgentActionItem, AgentRunStatus } from "@/components/console/types";
 import { validatePromptInput } from "@/components/console/validation";
 import { submitAgentPrompt } from "@/lib/api/agent-console";
 import { createPlan, type PlannerResponse } from "@/lib/api/planner";
 import { evaluateSecurity, type SecurityEvaluationResponse } from "@/lib/api/security";
-
-function toApprovalContext(plan: PlannerResponse, sec: SecurityEvaluationResponse): ApprovalContext {
-  const risky = sec.approval_recommendation !== "approve";
-  return {
-    title: "Agent Firewall Approval Request",
-    explanation: `${plan.safety_note}\n\n${sec.risk_explanation}`,
-    riskLevel: risky ? "risky" : "safe",
-    policyDetails: [
-      { label: "Risk score", value: `${sec.risk_score}/100`, pass: sec.risk_score < 55 },
-      ...sec.policy_findings.map((p) => ({
-        label: p.policy_id,
-        value: p.explanation.length > 90 ? `${p.explanation.slice(0, 90)}…` : p.explanation,
-        pass: p.passed
-      }))
-    ]
-  };
-}
 
 export function useAgentConsole() {
   const [prompt, setPrompt] = useState("");
@@ -42,7 +19,6 @@ export function useAgentConsole() {
   const [isSimulationLoading, setIsSimulationLoading] = useState(false);
   const [approvalOpen, setApprovalOpen] = useState(false);
   const [approvalDecision, setApprovalDecision] = useState<ApprovalDecision>("pending");
-  const [approvalContext, setApprovalContext] = useState<ApprovalContext | null>(null);
   const [approvalPlan, setApprovalPlan] = useState<PlannerResponse | null>(null);
   const [approvalSecurity, setApprovalSecurity] = useState<SecurityEvaluationResponse | null>(null);
   const [panicLockEnabled, setPanicLockEnabled] = useState(false);
@@ -74,7 +50,6 @@ export function useAgentConsole() {
 
       setApprovalPlan(plan);
       setApprovalSecurity(security);
-      setApprovalContext(toApprovalContext(plan, security));
 
       setPromptHistory((previous) => [trimmed, ...previous].slice(0, 8));
       setActions((previous) =>
@@ -120,7 +95,6 @@ export function useAgentConsole() {
       setApprovalOpen(false);
       setApprovalPlan(null);
       setApprovalSecurity(null);
-      setApprovalContext(null);
     } finally {
       setIsSimulationLoading(false);
     }
@@ -210,7 +184,6 @@ export function useAgentConsole() {
     setApprovalOpen,
     approvalDecision,
     setApprovalDecision,
-    approvalContext,
     approvalPlan,
     approvalSecurity,
     panicLockEnabled,

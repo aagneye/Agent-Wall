@@ -25,7 +25,8 @@ export function AgentConsole() {
     promptHistory,
     preview,
     isSimulationLoading,
-    approvalContext,
+    approvalPlan,
+    approvalSecurity,
     approvalOpen,
     approveAction,
     rejectAction,
@@ -40,7 +41,7 @@ export function AgentConsole() {
         <ConsoleHeader />
         <div className="card-elevated rounded-xl p-3 text-xs text-slate-300">
           Demo tip: start with <span className="text-slate-100">"Optimize my USDC yield safely"</span> to
-          showcase full plan, simulation, and approval flow in under 30 seconds.
+          showcase planner, security evaluation, and approval flow in under 30 seconds.
         </div>
         <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
           <ConsoleShell>
@@ -63,7 +64,7 @@ export function AgentConsole() {
             <RecentActions items={actions} />
             <PromptHistory items={promptHistory} />
             <TransactionPreview preview={preview} isLoading={isSimulationLoading} />
-            <RiskCard context={approvalContext} />
+            <RiskCard plan={approvalPlan} security={approvalSecurity} />
             <PanicButton onPanic={triggerPanicLock} disabled={panicLockEnabled} />
             {panicLockEnabled ? (
               <div className="rounded-xl border border-rose-400/40 bg-rose-950/40 p-3 text-xs text-rose-200">
@@ -78,7 +79,8 @@ export function AgentConsole() {
         </div>
         <ApprovalModal
           open={approvalOpen}
-          context={approvalContext}
+          plan={approvalPlan}
+          security={approvalSecurity}
           onApprove={approveAction}
           onReject={rejectAction}
           onClose={() => setApprovalOpen(false)}
