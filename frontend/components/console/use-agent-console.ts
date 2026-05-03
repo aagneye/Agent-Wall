@@ -43,6 +43,12 @@ export function useAgentConsole() {
   }
 
   async function submitPrompt(): Promise<void> {
+    if (panicLockEnabled) {
+      setError("Emergency lock is active. Reset lock mode before submitting new actions.");
+      setStatus("error");
+      return;
+    }
+
     const validationError = validatePromptInput(prompt);
     if (validationError) {
       setError(validationError);
@@ -151,6 +157,20 @@ export function useAgentConsole() {
     ].slice(0, 12));
   }
 
+  function resetEmergencyLock(): void {
+    setPanicLockEnabled(false);
+    setError(null);
+    setActivityLog((previous) => [
+      {
+        id: crypto.randomUUID(),
+        message: "Emergency lock reset by user. Console returned to guarded normal mode.",
+        level: "info",
+        timestamp: new Date().toLocaleTimeString("en-US", { hour12: false })
+      },
+      ...previous
+    ].slice(0, 12));
+  }
+
   return {
     prompt,
     setPrompt,
@@ -179,6 +199,7 @@ export function useAgentConsole() {
     approveAction,
     rejectAction,
     triggerPanicLock,
+    resetEmergencyLock,
     submitPrompt
   };
 }
