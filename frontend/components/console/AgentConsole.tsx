@@ -26,6 +26,7 @@ export function AgentConsole() {
     isSimulationLoading,
     approvalPlan,
     approvalSecurity,
+    approvalExplanation,
     approvalOpen,
     approveAction,
     rejectAction,
@@ -80,6 +81,7 @@ export function AgentConsole() {
           open={approvalOpen}
           plan={approvalPlan}
           security={approvalSecurity}
+          explanation={approvalExplanation}
           onApprove={approveAction}
           onReject={rejectAction}
           onClose={() => setApprovalOpen(false)}
