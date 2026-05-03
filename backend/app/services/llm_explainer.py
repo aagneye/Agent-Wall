@@ -20,4 +20,28 @@ SYSTEM_PROMPT = (
 
 async def explain_transaction(plan: dict, security: dict) -> str:
     """Return a concise explanation from GPT-4o-mini, or a fixed fallback string on failure."""
-    return FALLBACK_EXPLANATION
+    api_key = (settings.OPENAI_API_KEY or "").strip()
+    if not api_key:
+        return FALLBACK_EXPLANATION
+
+    user_message = json.dumps({"plan": plan, "security": security})
+
+    try:
+        client = AsyncOpenAI(api_key=api_key)
+        completion = await client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": user_message},
+            ],
+        )
+
+        raw = completion.choices[0].message.content
+        text = raw.strip() if raw else ""
+
+        return text if text else FALLBACK_EXPLANATION
+
+    except (APIError, RateLimitError, APITimeoutError):
+        return FALLBACK_EXPLANATION
+    except Exception:
+        return FALLBACK_EXPLANATION
