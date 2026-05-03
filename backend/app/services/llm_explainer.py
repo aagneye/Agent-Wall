@@ -1,5 +1,7 @@
 """OpenAI-backed plain-English explanations for planner and security payloads."""
 
+from __future__ import annotations
+
 FALLBACK_EXPLANATION = "Unable to generate explanation. Review the risk details manually."
 
 SYSTEM_PROMPT = (
