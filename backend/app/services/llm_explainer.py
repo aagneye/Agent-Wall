@@ -26,7 +26,7 @@ async def explain_transaction(plan: dict, security: dict) -> str:
     if not api_key:
         return FALLBACK_EXPLANATION
 
-    user_message = json.dumps({"plan": plan, "security": security})
+    user_message = json.dumps({"plan": plan, "security": security}, ensure_ascii=False)
 
     try:
         client = AsyncOpenAI(api_key=api_key)
