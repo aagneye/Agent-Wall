@@ -23,7 +23,6 @@ export function AgentConsole() {
     actions,
     activityLog,
     promptHistory,
-    preview,
     isSimulationLoading,
     approvalPlan,
     approvalSecurity,
@@ -63,7 +62,7 @@ export function AgentConsole() {
           <div className="space-y-4">
             <RecentActions items={actions} />
             <PromptHistory items={promptHistory} />
-            <TransactionPreview preview={preview} isLoading={isSimulationLoading} />
+            <TransactionPreview security={approvalSecurity} isLoading={isSimulationLoading} />
             <RiskCard plan={approvalPlan} security={approvalSecurity} />
             <PanicButton onPanic={triggerPanicLock} disabled={panicLockEnabled} />
             {panicLockEnabled ? (

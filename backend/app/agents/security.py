@@ -45,6 +45,8 @@ def _policy_result_from_findings(findings: list[PolicyFinding]) -> PolicyResult:
     if not failed:
         return PolicyResult(allowed=True, reason="All policy checks passed.")
     reason = "; ".join(f"{item.policy_id}: {item.explanation}" for item in failed)
+    if len(reason) > 800:
+        reason = reason[:797] + "..."
     return PolicyResult(allowed=False, reason=reason)
 
 

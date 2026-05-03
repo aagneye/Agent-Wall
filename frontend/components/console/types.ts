@@ -18,18 +18,4 @@ export type ActivityLogItem = {
   timestamp: string;
 };
 
-export type TransactionPreviewData = {
-  deterministic: boolean;
-  tokenMovements: Array<{
-    token: string;
-    direction: "in" | "out";
-    amountUsd: number;
-  }>;
-  gasEstimateUsd: number;
-  approvalSizeUsd: number;
-  failureRisk: "low" | "medium" | "high";
-  suspiciousBehaviorDetected: boolean;
-  humanExplanation: string;
-};
-
 export type ApprovalDecision = "approved" | "rejected" | "pending";

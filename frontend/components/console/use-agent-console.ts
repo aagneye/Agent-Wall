@@ -15,7 +15,6 @@ export function useAgentConsole() {
   const [promptHistory, setPromptHistory] = useState<string[]>([]);
   const [actions, setActions] = useState<AgentActionItem[]>(initialRecentActions);
   const [activityLog, setActivityLog] = useState<ActivityLogItem[]>(initialActivityLog);
-  const [preview] = useState<null>(null);
   const [isSimulationLoading, setIsSimulationLoading] = useState(false);
   const [approvalOpen, setApprovalOpen] = useState(false);
   const [approvalDecision, setApprovalDecision] = useState<ApprovalDecision>("pending");
@@ -44,6 +43,9 @@ export function useAgentConsole() {
     setIsSimulationLoading(true);
 
     try {
+      setApprovalPlan(null);
+      setApprovalSecurity(null);
+
       const response = await submitAgentPrompt({ prompt: trimmed });
       const plan = await createPlan({ prompt: trimmed, runId: response.runId });
       const security = await evaluateSecurity({ plan, runId: response.runId });
@@ -178,7 +180,6 @@ export function useAgentConsole() {
     setActions,
     activityLog,
     setActivityLog,
-    preview,
     isSimulationLoading,
     approvalOpen,
     setApprovalOpen,
