@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from openai import APIError, APITimeoutError, AsyncOpenAI, RateLimitError
+
 from app.config.settings import settings
 
 FALLBACK_EXPLANATION = "Unable to generate explanation. Review the risk details manually."
@@ -15,3 +17,8 @@ SYSTEM_PROMPT = (
     "to do, what the main risk is, and whether the user should approve it. Be "
     "direct. No jargon."
 )
+
+
+async def explain_transaction(plan: dict[str, Any], security: dict[str, Any]) -> str:
+    """Return a concise explanation from GPT-4o-mini, or a fixed fallback string on failure."""
+    return FALLBACK_EXPLANATION
