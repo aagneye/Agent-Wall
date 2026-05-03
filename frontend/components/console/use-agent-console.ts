@@ -52,11 +52,18 @@ export function useAgentConsole() {
       const response = await submitAgentPrompt({ prompt: trimmed });
       const planResult = await createPlan({ prompt: trimmed, runId: response.runId });
       const securityResult = await evaluateSecurity({ plan: planResult, runId: response.runId });
-      const { explanation } = await explainTransaction({ plan: planResult, security: securityResult });
+
+      let explanationText: string | null = null;
+      try {
+        const explainResult = await explainTransaction({ plan: planResult, security: securityResult });
+        explanationText = explainResult.explanation;
+      } catch {
+        explanationText = null;
+      }
 
       setApprovalPlan(planResult);
       setApprovalSecurity(securityResult);
-      setApprovalExplanation(explanation);
+      setApprovalExplanation(explanationText);
 
       setPromptHistory((previous) => [trimmed, ...previous].slice(0, 8));
       setActions((previous) =>

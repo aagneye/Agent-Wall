@@ -40,7 +40,8 @@ export function AgentConsole() {
       <section className="mx-auto flex w-full max-w-7xl flex-col gap-8">
         <ConsoleHeader />
         <div className="card-elevated rounded-xl p-3 text-xs text-slate-300">
-          Demo tip: start with <span className="text-slate-100">"Optimize my USDC yield safely"</span> to
+          Demo tip: start with{" "}
+          <span className="text-slate-100">{"\u201cOptimize my USDC yield safely\u201d"}</span> to
           showcase planner, security evaluation, and approval flow in under 30 seconds.
         </div>
         <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
