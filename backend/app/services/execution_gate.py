@@ -5,13 +5,14 @@ Replace with persisted audit trail once DB-backed evaluate exists."""
 from dataclasses import dataclass
 from typing import Literal
 
-_RUN_SECURITY: dict[str, _RunSecurityRecord] = {}
-
 
 @dataclass(frozen=True)
 class _RunSecurityRecord:
     policy_allowed: bool
     risk_score: int
+
+
+_RUN_SECURITY: dict[str, _RunSecurityRecord] = {}
 
 
 def record_security_evaluation(run_id: str, policy_allowed: bool, risk_score: int) -> None:
