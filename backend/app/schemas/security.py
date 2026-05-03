@@ -59,17 +59,32 @@ class PolicyFinding(BaseModel):
     explanation: str
 
 
+RiskSeverityUi = Literal["low", "medium", "high", "critical"]
+
+
+class RiskRow(BaseModel):
+    """Single row in the evaluate response `risks` list (API shape)."""
+
+    type: str = Field(description="Identifier for the risk, typically the rule id")
+    description: str
+    severity: RiskSeverityUi
+
+
+class PolicyResult(BaseModel):
+    allowed: bool
+    reason: str = Field(min_length=1, max_length=800)
+
+
 class SecurityEvaluationResponse(BaseModel):
     deterministic: bool = True
     risk_score: int = Field(ge=0, le=100)
-    risk_explanation: str = Field(min_length=20, max_length=400)
-    approval_recommendation: Literal["approve", "needs_human_review", "reject"]
-    risk_findings: list[RiskFinding]
-    policy_findings: list[PolicyFinding]
+    risk_level: Literal["low", "medium", "high", "critical"]
+    risks: list[RiskRow]
+    policy_result: PolicyResult
 
-    @field_validator("risk_findings", "policy_findings")
+    @field_validator("risks")
     @classmethod
-    def ensure_non_empty_findings(cls, value: list[BaseModel]) -> list[BaseModel]:
+    def ensure_non_empty_risks(cls, value: list[RiskRow]) -> list[RiskRow]:
         if len(value) == 0:
-            raise ValueError("At least one finding is required for explainability.")
+            raise ValueError("At least one risk row is required for explainability.")
         return value
