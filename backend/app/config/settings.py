@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     SUPABASE_ANON_KEY: str = ""
     DATABASE_URL: str = ""
 
+    OPENAI_API_KEY: str = ""
+
     # Comma-separated origins for browser CORS (preflight OPTIONS). Frontend dev server by default.
     BACKEND_CORS_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
 
