@@ -13,3 +13,4 @@ api_router.include_router(agent_console_router, prefix="/agent/console", tags=["
 api_router.include_router(planner_router, prefix="/agent/planner", tags=["planner"])
 api_router.include_router(security_router, prefix="/agent/security", tags=["security"])
 api_router.include_router(preview_router, prefix="/agent/preview", tags=["preview"])
+api_router.include_router(explain_router, prefix="/agent/explain", tags=["explain"])
