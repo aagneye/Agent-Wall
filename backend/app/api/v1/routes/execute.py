@@ -1,5 +1,5 @@
 import json
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -53,7 +53,7 @@ async def agent_execute(
             "plan_summary": _plan_summary(payload.plan),
             "security_score": risk if risk is not None else -1,
             "keeper_job_id": keeper_job_id,
-            "timestamp": datetime.now(UTC).isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "user_address": payload.user_address,
         },
     )
