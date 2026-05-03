@@ -4,5 +4,10 @@ router = APIRouter()
 
 
 @router.get("/")
-def healthcheck() -> dict[str, str]:
+def healthcheck_get() -> dict[str, str]:
+    return {"status": "ok"}
+
+
+@router.post("/")
+def healthcheck_post() -> dict[str, str]:
     return {"status": "ok"}

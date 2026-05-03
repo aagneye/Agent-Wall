@@ -7,9 +7,9 @@ from app.schemas.agent_console import AgentConsoleSubmitResponse
 
 
 class AgentConsoleService:
-    def submit_prompt(self, db: Session, prompt: str) -> AgentConsoleSubmitResponse:
+    def submit_prompt(self, db: Session, prompt: str, user_address: str | None = None) -> AgentConsoleSubmitResponse:
         run_id = str(uuid.uuid4())
-        row = AgentRun(run_id=run_id, prompt=prompt, status="pending")
+        row = AgentRun(run_id=run_id, prompt=prompt, status="pending", wallet_address=user_address)
         db.add(row)
         db.commit()
         db.refresh(row)

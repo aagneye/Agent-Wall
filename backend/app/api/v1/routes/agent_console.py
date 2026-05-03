@@ -14,4 +14,4 @@ def submit_prompt(
     payload: AgentConsoleSubmitRequest,
     db: Session = Depends(get_db),
 ) -> AgentConsoleSubmitResponse:
-    return service.submit_prompt(db, payload.prompt)
+    return service.submit_prompt(db, payload.prompt, payload.user_address)

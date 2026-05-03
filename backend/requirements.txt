@@ -7,5 +7,6 @@ supabase
 python-dotenv
 alembic
 openai
+requests
 ruff
 mypy
