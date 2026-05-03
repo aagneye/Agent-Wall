@@ -12,6 +12,8 @@ class Settings(BaseSettings):
 
     OPENAI_API_KEY: str = ""
 
+    KEEPERHUB_API_KEY: str = ""
+
     # Comma-separated origins for browser CORS (preflight OPTIONS). Frontend dev server by default.
     BACKEND_CORS_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
 
