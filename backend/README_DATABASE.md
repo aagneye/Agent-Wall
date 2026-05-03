@@ -2,6 +2,8 @@
 
 This project uses **SQLAlchemy** with **Alembic** for database migrations. The schema is version-controlled and can be applied to your Supabase PostgreSQL database.
 
+Migration scripts live under **`migrations/`** (not `alembic/`), so they do not shadow the installed Alembic package when you run `python -m alembic` from this folder.
+
 ## Schema Overview
 
 The database includes these tables:

@@ -33,10 +33,10 @@ Choose one method:
 cd "C:\Projects\Agnet Wall\backend"
 
 # Create initial migration
-& ".\.venv\Scripts\python.exe" -m alembic revision --autogenerate -m "Initial schema"
+& ".\.venv\Scripts\alembic.exe" revision --autogenerate -m "Initial schema"
 
 # Apply migration to Supabase
-& ".\.venv\Scripts\python.exe" -m alembic upgrade head
+& ".\.venv\Scripts\alembic.exe" upgrade head
 ```
 
 ### Option B: Direct creation (Quick for development)
