@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-from typing import Any
 
 from openai import APIError, APITimeoutError, AsyncOpenAI, RateLimitError
 
@@ -19,6 +18,6 @@ SYSTEM_PROMPT = (
 )
 
 
-async def explain_transaction(plan: dict[str, Any], security: dict[str, Any]) -> str:
+async def explain_transaction(plan: dict, security: dict) -> str:
     """Return a concise explanation from GPT-4o-mini, or a fixed fallback string on failure."""
     return FALLBACK_EXPLANATION
