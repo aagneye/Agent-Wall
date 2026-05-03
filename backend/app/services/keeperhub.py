@@ -4,10 +4,12 @@
 
 from uuid import uuid4
 
+from app.config.settings import settings
+
 
 async def execute_transaction(plan: dict, user_address: str) -> dict:
     """Queue on-chain execution via KeeperHub (stub)."""
-    _ = (plan, user_address)
+    _ = (plan, user_address, settings.KEEPERHUB_API_KEY)
 
     return {
         "keeper_job_id": "khub_" + uuid4().hex[:8],
