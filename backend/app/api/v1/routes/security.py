@@ -40,5 +40,5 @@ def _security_request_from_plan(payload: SecurityEvaluationFromPlanRequest) -> S
 @router.post("/evaluate", response_model=SecurityEvaluationResponse)
 def evaluate_security(payload: SecurityEvaluationFromPlanRequest) -> SecurityEvaluationResponse:
     response = agent.evaluate(_security_request_from_plan(payload))
-    record_security_evaluation(payload.run_id, response.policy_result.allowed)
+    record_security_evaluation(payload.run_id, response.policy_result.allowed, response.risk_score)
     return response
