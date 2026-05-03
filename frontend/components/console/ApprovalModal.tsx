@@ -6,6 +6,8 @@ type ApprovalModalProps = {
   open: boolean;
   plan: PlannerResponse | null;
   security: SecurityEvaluationResponse | null;
+  /** Plain-language summary from POST /agent/explain; omit or null shows a fallback hint. */
+  explanation?: string | null;
   onApprove: () => void;
   onReject: () => void;
   onClose: () => void;
@@ -28,7 +30,15 @@ function severityLabelClass(severity: RiskSeverityUi): string {
   return "text-rose-300";
 }
 
-export function ApprovalModal({ open, plan, security, onApprove, onReject, onClose }: ApprovalModalProps) {
+export function ApprovalModal({
+  open,
+  plan,
+  security,
+  explanation = null,
+  onApprove,
+  onReject,
+  onClose
+}: ApprovalModalProps) {
   if (!open || !plan || !security) {
     return null;
   }
@@ -39,7 +49,20 @@ export function ApprovalModal({ open, plan, security, onApprove, onReject, onClo
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm">
       <div className="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-slate-200/15 bg-gradient-to-br from-slate-950 to-slate-900 p-5 shadow-2xl shadow-cyan-500/10">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="rounded-xl border border-cyan-500/25 bg-gradient-to-br from-cyan-950/40 to-slate-950/80 p-3.5 shadow-inner shadow-cyan-900/20">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-200/85">AI Analysis</p>
+          {explanation ? (
+            <blockquote className="mt-2 border-l-[3px] border-cyan-400/55 pl-3 text-sm leading-relaxed text-slate-100/95">
+              {explanation}
+            </blockquote>
+          ) : (
+            <p className="mt-2 text-sm italic text-slate-500">
+              AI summary is not available for this request. Review the planner and risk details below.
+            </p>
+          )}
+        </div>
+
+        <div className="mt-5 flex flex-wrap items-center gap-2">
           <h2 className="text-lg font-semibold text-slate-100">Agent Firewall Approval Request</h2>
           <span
             className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${riskScoreBadgeClass(security.risk_score)}`}
