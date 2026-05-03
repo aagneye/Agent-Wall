@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import json
+from typing import Any
+
 FALLBACK_EXPLANATION = "Unable to generate explanation. Review the risk details manually."
 
 SYSTEM_PROMPT = (
