@@ -2,8 +2,12 @@ import json
 from datetime import UTC, datetime
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
+from app.db.session import get_db
+from app.models.agent_run import AgentRun
 from app.schemas.execute import AgentExecuteRequest, AgentExecuteResponse
 from app.services.execution_gate import execution_gate_status, last_recorded_risk_score
 from app.services.keeperhub import execute_transaction
@@ -21,7 +25,10 @@ def _plan_summary(plan: dict[str, Any]) -> str:
 
 
 @router.post("", response_model=AgentExecuteResponse)
-async def agent_execute(payload: AgentExecuteRequest) -> AgentExecuteResponse:
+async def agent_execute(
+    payload: AgentExecuteRequest,
+    db: Session = Depends(get_db),
+) -> AgentExecuteResponse:
     """Relay execution to KeeperHub only when policy allowed evaluate exists for this run."""
     gate = execution_gate_status(payload.run_id)
     if gate == "missing":
@@ -39,7 +46,7 @@ async def agent_execute(payload: AgentExecuteRequest) -> AgentExecuteResponse:
     keeper_job_id = raw["keeper_job_id"]
     risk = last_recorded_risk_score(payload.run_id)
 
-    await log_audit_event(
+    zerog_audit_uri = await log_audit_event(
         payload.run_id,
         {
             "run_id": payload.run_id,
@@ -50,6 +57,17 @@ async def agent_execute(payload: AgentExecuteRequest) -> AgentExecuteResponse:
             "user_address": payload.user_address,
         },
     )
+
+    run_row = db.scalar(select(AgentRun).where(AgentRun.run_id == payload.run_id))
+    if run_row is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Agent run not found for this run_id. Submit the console prompt first.",
+        )
+    run_row.status = "executing"
+    run_row.keeper_job_id = keeper_job_id
+    run_row.audit_trail_id = zerog_audit_uri
+    db.commit()
 
     return AgentExecuteResponse(
         job_id=keeper_job_id,
