@@ -7,6 +7,7 @@ from app.schemas.security import (
     SecurityEvaluationRequest,
     SecurityEvaluationResponse,
 )
+from app.services.execution_gate import record_security_evaluation
 
 router = APIRouter()
 agent = SecurityAgent()
@@ -38,5 +39,6 @@ def _security_request_from_plan(payload: SecurityEvaluationFromPlanRequest) -> S
 
 @router.post("/evaluate", response_model=SecurityEvaluationResponse)
 def evaluate_security(payload: SecurityEvaluationFromPlanRequest) -> SecurityEvaluationResponse:
-    _ = payload.run_id
-    return agent.evaluate(_security_request_from_plan(payload))
+    response = agent.evaluate(_security_request_from_plan(payload))
+    record_security_evaluation(payload.run_id, response.policy_result.allowed)
+    return response
