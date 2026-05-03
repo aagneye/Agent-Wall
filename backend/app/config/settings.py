@@ -9,8 +9,6 @@ class Settings(BaseSettings):
     SUPABASE_URL: str = ""
     SUPABASE_ANON_KEY: str = ""
     DATABASE_URL: str = ""
-    SAFE_TX_SERVICE_URL: str = ""
-    SAFE_FACTORY_ADDRESS: str = ""
 
     # Comma-separated origins for browser CORS (preflight OPTIONS). Frontend dev server by default.
     BACKEND_CORS_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
