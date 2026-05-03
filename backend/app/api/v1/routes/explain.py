@@ -12,5 +12,6 @@ router = APIRouter()
     summary="Explain transaction plan and security assessment",
 )
 async def agent_explain(payload: ExplainRequest) -> ExplainResponse:
+    """Produce a plain-language explanation for the given plan and security payload."""
     text = await explain_transaction(payload.plan, payload.security)
     return ExplainResponse(explanation=text)
