@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 PlannerActionType = Literal[
     "check_protocol_options",
@@ -14,7 +14,10 @@ PlannerRiskLevel = Literal["low", "medium"]
 
 
 class PlannerRequest(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
     prompt: str = Field(min_length=8, max_length=240)
+    run_id: str = Field(alias="runId", min_length=1)
 
     @field_validator("prompt")
     @classmethod
