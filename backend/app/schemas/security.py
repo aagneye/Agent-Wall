@@ -1,6 +1,8 @@
 from typing import Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+from app.schemas.planner import PlannerResponse
 
 SecurityActionType = Literal[
     "check_protocol_options",
@@ -33,6 +35,15 @@ class SecurityEvaluationRequest(BaseModel):
     @classmethod
     def normalize_wallet_address(cls, value: str) -> str:
         return value.strip().lower()
+
+
+class SecurityEvaluationFromPlanRequest(BaseModel):
+    """Evaluate security from a planner output (console workflow)."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    plan: PlannerResponse
+    run_id: str = Field(alias="runId", min_length=1)
 
 
 class RiskFinding(BaseModel):
